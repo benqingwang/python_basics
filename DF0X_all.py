@@ -1,181 +1,141 @@
-"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-A02_Insert Replace Delete Col Row.py
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
-
 import pandas as pd
 import os
-myPath=r'C:\Users\Danish\Desktop\python sample'
-os.chdir(myPath)
+from tabulate import tabulate
 
-"""********************************************************************
-Insert/Replace/Delete Rows/Columns
-(Use existing col -> Replace;Use new col -> Insert)
-********************************************************************"""
-data=[[1,2,3],[4,5,6]];df=pd.DataFrame(data,columns=['a','b','c'])
-
-#1 Insert/Replace columns
+# 我们用下面的例子
+data=[[1,2,3],[4,5,6]]
+df=pd.DataFrame(data,columns=['a','b','c'])
+print(tabulate(df, headers='keys', tablefmt='psql'))
+"""
++----+-----+-----+-----+
+|    |   a |   b |   c |
+|----+-----+-----+-----|
+|  0 |   1 |   2 |   3 |
+|  1 |   4 |   5 |   6 |
++----+-----+-----+-----+
+"""
+# ==========================================================================
+# 1. Insert Replace a column
+# ==========================================================================
+#1 插入或者replace一个column（值都只有一个)
 df['new col1']='a' # can be a scalar 
-df['new col2']=[10,20] # can be a list/series/array
+"""
++----+-----+-----+-----+------------+
+|    |   a |   b |   c | new col1   |
+|----+-----+-----+-----+------------|
+|  0 |   1 |   2 |   3 | a          |
+|  1 |   4 |   5 |   6 | a          |
++----+-----+-----+-----+------------+
+"""
+
+#2 插入或者replace一个column（值不一样，用list代表所有数值)
+df['new col2']=[10,20]
++----+-----+-----+-----+------------+
+|    |   a |   b |   c |   new col2 |
+|----+-----+-----+-----+------------|
+|  0 |   1 |   2 |   3 |         10 |
+|  1 |   4 |   5 |   6 |         20 |
++----+-----+-----+-----+------------+
+
+#3 插入或者replace一个column（根据另一个column)
+data=[[1,2,3],[4,5,6]]
+df=pd.DataFrame(data,columns=['a','b','c'])
+df['new col1']='a'
+df['new col3']=df['new col1']*2
++----+-----+-----+-----+------------+------------+
+|    |   a |   b |   c | new col1   | new col3   |
+|----+-----+-----+-----+------------+------------|
+|  0 |   1 |   2 |   3 | a          | aa         |
+|  1 |   4 |   5 |   6 | a          | aa         |
++----+-----+-----+-----+------------+------------+   
 df['new col3']=df['new col1']*2 # can be calculated based on other col
-df['new col1']='b' # use existing col name to replace
-df.insert(1,'new col2',99)#2 Insert a column at certain location
 
-#2 Insert/Replace rows
+#4 指定location的插入
+data=[[1,2,3],[4,5,6]]
+df=pd.DataFrame(data,columns=['a','b','c'])
+df.insert(1,'new col2',99) # 在位置1的后面插入，新column的名字，值
++----+-----+------------+-----+-----+
+|    |   a |   new col2 |   b |   c |
+|----+-----+------------+-----+-----|
+|  0 |   1 |         99 |   2 |   3 |
+|  1 |   4 |         99 |   5 |   6 |
++----+-----+------------+-----+-----+
+
+# ==========================================================================
+# 2. Insert Replace a Row
+# ==========================================================================
+# 1. 在最后一行后面加一行
+data=[[1,2,3],[4,5,6]]
+df=pd.DataFrame(data,columns=['a','b','c'])
 df.loc['new row']=[1,2,3]
-df.loc[-1]=[1,2,3]
++---------+-----+-----+-----+
+|         |   a |   b |   c |
+|---------+-----+-----+-----|
+| 0       |   1 |   2 |   3 |
+| 1       |   4 |   5 |   6 |
+| new row |   1 |   2 |   3 |
++---------+-----+-----+-----+
+
 df.iloc[-1]=[4,5,6]
-df=df.append(pd.DataFrame([[7,8,9]],columns=['a','b','c'])) #use append
++----+-----+-----+-----+
+|    |   a |   b |   c |
+|----+-----+-----+-----|
+|  0 |   1 |   2 |   3 |
+|  1 |   4 |   5 |   6 |
+| -1 |   4 |   5 |   6 |
++----+-----+-----+-----+
 
-"""********************************************************************
-Delete Rows/Columns
-
-********************************************************************"""
-""" Sample DF
-   a  b  c
-0  1  2  3
-1  4  5  6"""
-
-#1 Delete columns
+# ==========================================================================
+# 3. Delete Rows/Columns
+# ==========================================================================
+# Delete Columns
 df.drop(['a','b'], axis=1) 
 df.drop(columns=['a','b'])
-del df['a'];del df['a']     # delete a col using del
+del df['a'];del df['b']    
 
-"""
-   c
-0  3
-1  6"""
-
-#2 Delete rows
+# Delete rows
 df.drop([1])        # delete a row using drop its name
 df[:-1]             # delete last row
 df.iloc[:-1]        # delete last row
-"""
-   b  c
-0  2  3
-"""
-"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-A03_Rename Index Sort and Filter.py
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
 
-import pandas as pd
-import os 
-myPath=r'C:\Users\Danish\Desktop\python sample'
-os.chdir(myPath)
-
-"""********************************************************************
-Sample Data
-********************************************************************"""
-data=[[1,2,3],[4,5,6],[7,8,9],[10,11,12]];df=pd.DataFrame(data,columns=['a','b','c'])
-"""
-    a   b   c
-0   1   2   3
-1   4   5   6
-2   7   8   9
-3  10  11  12"""
-
-"""********************************************************************
-Rename/Set/Drop Index
-********************************************************************"""
-#1 Rename
+# ==========================================================================
+# 4. Rename Columns
+# ==========================================================================
 df.columns = ['x','y','z'] # rename all the cols 
 df=df.rename(columns = {'x':'xxx','y':'yyy'}) # rename certain cols
-df.index=['a1','a2'] # reanme all the index
-df=df.rename(index = {'a1':'a11'}) # rename certain index
 
-#2 Set/Drop Index
-df1=df.set_index('a') # set one col as index
-df2=df1.reset_index(drop=False) # drop both index and index col
-df3=df1.reset_index(drop=True) # drop idx but keep col
-df4=df.reset_index(drop=False) # if no col name, "Index" will be "index"
-
-"""********************************************************************
-Mutiple Index
-********************************************************************"""
-df.index=pd.MultiIndex.from_tuples([('d',1),('d',2),('e',3),('f',4)])
-"""
-      a   b   c
-d 1   1   2   3
-  2   4   5   6
-e 3   7   8   9
-f 4  10  11  12
-"""
-"""********************************************************************
-Sort DF
-********************************************************************"""
-data=[[4,8,3],[1,2,3],[7,5,9]];df=pd.DataFrame(data,columns=['a','b','c'])
-"""
-   a  b  c
-0  4  8  3
-1  1  2  3
-2  7  5  9"""
-
-df.sort_values('c',ascending=False)              # single sort criteria
-'''
-   a  b  c
-2  7  5  9
-0  4  8  3
-1  1  2  3'''
-
-df.sort_values(['c','b'],ascending=[False,True]) # multiple sort
-"""
-   a  b  c
-2  7  5  9
-1  1  2  3
-0  4  8  3
-"""
-
-
-"""********************************************************************
-Rank DF:返回对应原色的排名数
-********************************************************************"""
-data=[[4,8,3],[1,2,3],[7,5,9]];df=pd.DataFrame(data,columns=['a','b','c'])
-"""
-   a  b  c
-0  4  8  3
-1  1  2  3
-2  7  5  9"""
-
-df['b'].rank()  # df[].rank() return a series or a DF
-"""
-0    3.0
-1    1.0
-2    2.0"""
-
-df.rank()       
-"""
-  a    b    c
-0  2.0  3.0  1.5
-1  1.0  1.0  1.5
-2  3.0  2.0  3.0"""
-"""********************************************************************
-Filter DF's label (column name and row name)
-********************************************************************"""
+# ==========================================================================
+# 5. Filter DF's label (column name and row name)
+# ==========================================================================
 data=[['Nemo',2,3],['Bob',5,6],['Lulu',8,9]]
 df=pd.DataFrame(data,columns=['cat','age','weight']) 
 df=df.set_index('cat')
-"""
-      age  weight
-cat              
-Nemo    2       3
-Bob     5       6
-Lulu    8       9"""
+print(tabulate(df, headers='keys', tablefmt='psql'))
++-------+-------+----------+
+| cat   |   age |   weight |
+|-------+-------+----------|
+| Nemo  |     2 |        3 |
+| Bob   |     5 |        6 |
+| Lulu  |     8 |        9 |
++-------+-------+----------+
 
-#1. fileter on column name (as axis=1), like means including letter'a' 
-df.filter(like='a', axis=1)
-"""
-      age
-cat      
-Nemo    2
-Bob     5
-Lulu    8"""
+#1. 用like对一个DF的column name进行fileter (as axis=1), like means including letter'a' 
+df = df.filter(like='a', axis=1)
++-------+-------+
+| cat   |   age |
+|-------+-------|
+| Nemo  |     2 |
+| Bob   |     5 |
+| Lulu  |     8 |
++-------+-------+
 
-#2 fileter on index name (as axis=0), regex is similar to module re 
-
+#2 用Regex也可以filter。下面的例子是对index进行filter(as axis=0), regex is similar to module re 
 df.filter(regex=r'\w+o\w+',axis=0)
-"""
-     age  weight
-cat             
-Bob    5       6"""
++-------+-------+
+| cat   |   age |
+|-------+-------|
+| Bob   |     5 |
++-------+-------+
 
 
 """$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
