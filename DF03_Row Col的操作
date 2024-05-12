@@ -1,0 +1,308 @@
+"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+A02_Insert Replace Delete Col Row.py
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
+
+import pandas as pd
+import os
+myPath=r'C:\Users\Danish\Desktop\python sample'
+os.chdir(myPath)
+
+"""********************************************************************
+Insert/Replace/Delete Rows/Columns
+(Use existing col -> Replace;Use new col -> Insert)
+********************************************************************"""
+data=[[1,2,3],[4,5,6]];df=pd.DataFrame(data,columns=['a','b','c'])
+
+#1 Insert/Replace columns
+df['new col1']='a' # can be a scalar 
+df['new col2']=[10,20] # can be a list/series/array
+df['new col3']=df['new col1']*2 # can be calculated based on other col
+df['new col1']='b' # use existing col name to replace
+df.insert(1,'new col2',99)#2 Insert a column at certain location
+
+#2 Insert/Replace rows
+df.loc['new row']=[1,2,3]
+df.loc[-1]=[1,2,3]
+df.iloc[-1]=[4,5,6]
+df=df.append(pd.DataFrame([[7,8,9]],columns=['a','b','c'])) #use append
+
+"""********************************************************************
+Delete Rows/Columns
+
+********************************************************************"""
+""" Sample DF
+   a  b  c
+0  1  2  3
+1  4  5  6"""
+
+#1 Delete columns
+df.drop(['a','b'], axis=1) 
+df.drop(columns=['a','b'])
+del df['a'];del df['a']     # delete a col using del
+
+"""
+   c
+0  3
+1  6"""
+
+#2 Delete rows
+df.drop([1])        # delete a row using drop its name
+df[:-1]             # delete last row
+df.iloc[:-1]        # delete last row
+"""
+   b  c
+0  2  3
+"""
+"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+A03_Rename Index Sort and Filter.py
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
+
+import pandas as pd
+import os 
+myPath=r'C:\Users\Danish\Desktop\python sample'
+os.chdir(myPath)
+
+"""********************************************************************
+Sample Data
+********************************************************************"""
+data=[[1,2,3],[4,5,6],[7,8,9],[10,11,12]];df=pd.DataFrame(data,columns=['a','b','c'])
+"""
+    a   b   c
+0   1   2   3
+1   4   5   6
+2   7   8   9
+3  10  11  12"""
+
+"""********************************************************************
+Rename/Set/Drop Index
+********************************************************************"""
+#1 Rename
+df.columns = ['x','y','z'] # rename all the cols 
+df=df.rename(columns = {'x':'xxx','y':'yyy'}) # rename certain cols
+df.index=['a1','a2'] # reanme all the index
+df=df.rename(index = {'a1':'a11'}) # rename certain index
+
+#2 Set/Drop Index
+df1=df.set_index('a') # set one col as index
+df2=df1.reset_index(drop=False) # drop both index and index col
+df3=df1.reset_index(drop=True) # drop idx but keep col
+df4=df.reset_index(drop=False) # if no col name, "Index" will be "index"
+
+"""********************************************************************
+Mutiple Index
+********************************************************************"""
+df.index=pd.MultiIndex.from_tuples([('d',1),('d',2),('e',3),('f',4)])
+"""
+      a   b   c
+d 1   1   2   3
+  2   4   5   6
+e 3   7   8   9
+f 4  10  11  12
+"""
+"""********************************************************************
+Sort DF
+********************************************************************"""
+data=[[4,8,3],[1,2,3],[7,5,9]];df=pd.DataFrame(data,columns=['a','b','c'])
+"""
+   a  b  c
+0  4  8  3
+1  1  2  3
+2  7  5  9"""
+
+df.sort_values('c',ascending=False)              # single sort criteria
+'''
+   a  b  c
+2  7  5  9
+0  4  8  3
+1  1  2  3'''
+
+df.sort_values(['c','b'],ascending=[False,True]) # multiple sort
+"""
+   a  b  c
+2  7  5  9
+1  1  2  3
+0  4  8  3
+"""
+
+
+"""********************************************************************
+Rank DF:返回对应原色的排名数
+********************************************************************"""
+data=[[4,8,3],[1,2,3],[7,5,9]];df=pd.DataFrame(data,columns=['a','b','c'])
+"""
+   a  b  c
+0  4  8  3
+1  1  2  3
+2  7  5  9"""
+
+df['b'].rank()  # df[].rank() return a series or a DF
+"""
+0    3.0
+1    1.0
+2    2.0"""
+
+df.rank()       
+"""
+  a    b    c
+0  2.0  3.0  1.5
+1  1.0  1.0  1.5
+2  3.0  2.0  3.0"""
+"""********************************************************************
+Filter DF's label (column name and row name)
+********************************************************************"""
+data=[['Nemo',2,3],['Bob',5,6],['Lulu',8,9]]
+df=pd.DataFrame(data,columns=['cat','age','weight']) 
+df=df.set_index('cat')
+"""
+      age  weight
+cat              
+Nemo    2       3
+Bob     5       6
+Lulu    8       9"""
+
+#1. fileter on column name (as axis=1), like means including letter'a' 
+df.filter(like='a', axis=1)
+"""
+      age
+cat      
+Nemo    2
+Bob     5
+Lulu    8"""
+
+#2 fileter on index name (as axis=0), regex is similar to module re 
+
+df.filter(regex=r'\w+o\w+',axis=0)
+"""
+     age  weight
+cat             
+Bob    5       6"""
+
+
+"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+A04_Select Sub-DF.py
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
+
+import pandas as pd
+import os
+import numpy as np
+myPath=r'C:\Users\Danish\Desktop\python sample'
+os.chdir(myPath)
+
+"""********************************************************************
+Sample DF
+********************************************************************"""
+data=[[1,2,3],[4,5,6],[7,8,9]];df=pd.DataFrame(data,columns=['a','b','c'])
+"""
+   a  b  c
+0  1  2  3
+1  4  5  6
+2  7  8  9"""
+
+"""********************************************************************
+Select a cell in DF
+********************************************************************"""
+df.iloc[1,2]        # select per cell's index
+df.loc[1,'c']       # select per cell's column or row name
+
+'''Out[95]: 6'''
+
+"""********************************************************************
+Select rows/columns per location
+********************************************************************"""
+df.iloc[1:3]        # select rows per location (continuous row)
+df.iloc[[0,2]]      # select rows per location (discrete row)
+df.loc[1:3]         # select rows per row name
+
+df.iloc[:,0]        # select cols per col location (1 col)
+df.iloc[:,[0,2]]    # select cols per col location (discrete cols)
+df[['a','c']]       # select cols per col name
+
+"""********************************************************************
+Select sub-DF per location
+********************************************************************"""
+df.iloc[[0,2],[1,2]]        # select per location index (discrete)
+df.iloc[range(2),[1,2]]     # select per location index (continuous)
+df.iloc[0:2,[1,2]]          # select per location index (continuous)
+
+df.loc[[0,2],['a','c']]     # select per cell's column or row name
+df.loc[range(3),['a','c']]  # select per cell's column or row name
+df.loc[0:2,['a','c']]  # select per cell's column or row name
+
+"""********************************************************************
+Select sub-DF per conditions
+
+    Syntax: df[conditions]
+********************************************************************"""
+data=[['Nemo',2,3],['Bob',np.nan,6],['Lulu',8,9]]
+df=pd.DataFrame(data,columns=['cat','age','weight'])
+"""
+    cat  age  weight
+0  Nemo  2.0       3
+1   Bob  NaN       6
+2  Lulu  8.0       9"""
+
+#1 Simple comparison
+df[df['age']<5]                        # variable compared with constant
+"""
+    cat  age  weight
+0  Nemo  2.0       3"""                 # nan is excluded
+
+df[df['weight']!=6]
+
+#2 Multiple conditions
+df[(df['age']<5) & (df['weight']!=6)]  # multiple condition "()" is a must
+df[(df['age']<5) | (df['weight']!=6)]  # | means or
+
+#3 value ISIN (a universee)
+condition1=df['age'].isin({2,5})
+condition2=df['weight'].isin({3,9})  
+df[condition1&condition2]
+
+#4 isnull and notnull
+df[df['age'].isnull()]
+"""
+   cat  age  weight
+1  Bob  NaN       6"""
+
+df[df['age'].notnull()]
+"""
+    cat  age  weight
+0  Nemo  2.0       3
+2  Lulu  8.0       9"""
+
+#5 value string test
+df[df['cat'].str.contains('o')]        # contain letter 'o'
+df[df['cat'].str.endswith('mo')]       # ends with 'mo‘
+df[df['cat'].str.startswith('Bo')]     # starts with 'Bo'
+df[df['cat'].apply(lambda x: (x.lower()).startswith('bo'))] # start with 'Bo' or 'bo'
+
+"""********************************************************************
+Select sub-DF per conditions + Select per location/name
+
+    Syntax: df[location][conditions]
+    Syntax: df.loc[condition,location]
+********************************************************************"""
+data=[['Nemo',2,3],['Bob',5,6],['Lulu',8,9]]
+df=pd.DataFrame(data,columns=['cat','age','weight'])
+"""
+    cat  age  weight
+0  Nemo    2       3
+1   Bob    5       6
+2  Lulu    8       9"""
+
+#1 df[location][conditions]
+condition1=df['age'].isin({2,5})
+condition2=df['weight'].isin({3,9})  
+df['cat'][condition1&condition2]
+df[['cat','age']][condition1&condition2]
+"""
+    cat  age
+0  Nemo    2"""
+
+#2 df.loc[condition,location]
+condition1=df['age'].isin({2,5})
+condition2=df['weight'].isin({3,9}) 
+df.loc[condition1&condition2,['cat','age']]
+"""
+    cat  age
+0  Nemo    2"""
