@@ -51,3 +51,116 @@ for col in select_cols:           # e.g. the first one is 'Product'
         output.loc[row,col]='\n'.join(list(subDF[col].values)) 
 
 # Method 3: Use self-defined function
+
+
+
+
+
+"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Combine lines with the same feature
+example: combine risk node lines with the same AE ID
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
+
+import pandas as pd
+
+"""********************************************************************
+1.Simple Case
+********************************************************************"""
+data=[['A','apple'],['A','avocado'],['B','banana'],['B','blueberry']]
+df=pd.DataFrame(data,columns=['Initial','Fruit'])
+"""
+  Initial      Fruit
+0       A      apple
+1       A    avocado
+2       B     banana
+3       B  blueberry"""
+
+output=df[['Initial']].drop_duplicates()
+df=df.set_index('Initial')
+def stack_lines(idx,df,col):
+    return ('\n').join(list(df.loc[idx,col].values))
+output['Fruit']=output['Initial'].apply(lambda x: stack_lines(x,df,'Fruit'))
+
+"""********************************************************************
+2. Multiple columns to combine
+********************************************************************"""
+data=[['A','apple','red'],
+      ['A','avocado','green'],
+      ['B','banana','yellow'],
+      ['B','blueberry','blue']]
+df=pd.DataFrame(data,columns=['Initial','Fruit','Color'])
+"""
+  Initial      Fruit   Color
+0       A      apple     red
+1       A    avocado   green
+2       B     banana  yellow
+3       B  blueberry    blue"""
+
+output=df[['Initial']].drop_duplicates()
+df=df.set_index('Initial')
+def stack_lines(idx,df,col):
+    return ('\n').join(list(df.loc[idx,col].values))
+
+for col in {'Fruit','Color'}:
+    output[col]=output['Initial'].apply(lambda x: stack_lines(x,df,col))
+"""********************************************************************
+3. Multiple columns to combine - different types
+********************************************************************"""
+data=[['A','apple','red',1],
+      ['A','avocado','green',2],
+      ['B','banana','yellow',3],
+      ['B','blueberry','blue',4]]
+df=pd.DataFrame(data,columns=['Initial','Fruit','Color','Qty'])
+"""
+  Initial      Fruit   Color  Qty
+0       A      apple     red    1
+1       A    avocado   green    2
+2       B     banana  yellow    3
+3       B  blueberry    blue    4"""
+
+
+output=df[['Initial']].drop_duplicates()
+df=df.set_index('Initial')
+def stack_lines(idx,df,col):
+    return ('\n').join(list(df.loc[idx,col].values.astype(str)))
+
+for col in {'Fruit','Color','Qty'}:
+    output[col]=output['Initial'].apply(lambda x: stack_lines(x,df,col))
+    
+"""********************************************************************
+3. Final Generalized method
+********************************************************************"""
+data=[['A','apple','red',1],
+      ['A','avocado','green',2],
+      ['B','banana','yellow',3],
+      ['B','blueberry','blue',4]]
+df=pd.DataFrame(data,columns=['Initial','Fruit','Color','Qty'])
+"""
+  Initial      Fruit   Color  Qty
+0       A      apple     red    1
+1       A    avocado   green    2
+2       B     banana  yellow    3
+3       B  blueberry    blue    4"""
+
+
+def combine_lines(df,key_col,combine_col_list):
+    output=df[[key_col]].drop_duplicates()
+    df=df.set_index(key_col)
+    def stack_lines(idx,df,col):
+        return ('\n').join(list(df.loc[idx,col].values.astype(str)))
+    for col in combine_col_list:
+        output[col]=output[key_col].apply(lambda x: stack_lines(x,df,col))
+    return output
+
+result=combine_lines(df,'Initial',['Fruit','Color','Qty'])
+
+"""********************************************************************
+4. Case study
+********************************************************************"""
+import os
+myPath=r'C:\Users\Danish\Desktop\python sample'
+os.chdir(myPath)
+df=pd.read_excel('python sample.xlsx','Database') 
+
+result=combine_lines(df,'Month',['Product','State','Sales $'])
+result.to_excel('temp.xlsx')
