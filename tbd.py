@@ -1,81 +1,8 @@
 
 
-"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-B04_Python Statements
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
-
-"""***********************************************************************
-1. Continuation:
-    using \
-    please note that nothing should be after \
-
-***********************************************************************"""
-
-x=1+2+3\
-+5+6+7\
-+8+9+10
- 
-x #-->51
-
-
-"""$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-B05 Python Logic
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"""
-
-"""***********************************************************************
-and是取大者的意思
-**********************************************************************"""
-3 and 5         #-->5
-3 and 5 and 7   #--> 7
-
-"""***********************************************************************
-连续的大小判断
-**********************************************************************"""
-4< (3 and 5) <7 #--> True
-4< (3 and 5) >4 #--> True
-4< (3 and 5) >7 #--> False
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct 18 08:37:46 2018
-
-@author: Danish
-"""
-
-import functools 
-import time
-
-def timer(func): 
-    """Print the runtime of the decorated function""" 
-    @functools.wraps(func) 
-    def wrapper_timer(*args, **kwargs): 
-        start_time = time.perf_counter() # 1 
-        value = func(*args, **kwargs) # run your function 
-        end_time = time.perf_counter() # 2 
-        run_time = (end_time - start_time)*(10**6) # 3 
-        print(f"Finished {func.__name__!r} in {run_time:.4f} m secs") 
-        return value
-    return wrapper_timer
-
-report_bin={}
-def reporter(func):
-    """print the funct name of the decorated function"""
-    @functools.wraps(func)
-    def wrapper_reporter(*args,**kwargs):
-        value=func(*args,**kwargs)
-        return value
-    report_bin[func.__doc__]=wrapper_reporter()
-    return wrapper_reporter
-
-@timer
-@reporter
-def print_numbers():
-    "I am printing numbers"
-    return 1*2
 
 
 
-
-print_numbers()
 
 """$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 Combine lines with the same feature
